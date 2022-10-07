@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdint.h>
 
 int64_t strto_int64(const char *restrict nptr, char **restrict endptr, int base)

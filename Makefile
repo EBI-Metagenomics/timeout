@@ -20,24 +20,21 @@ argless.o: argless.h
 fatal.o: fatal.h
 mssleep.o: mssleep.h
 strto.o: strto.h
-timeout.o: argless.h
+timeout.o: argless.h pp.h
 warn.o: warn.h
 
 timeout: $(OBJ)
 	$(CC) -o $@ $(OBJ)
 
 test check: timeout
-	rm -f stdin stdout stderr pid
-	./timeout sleep 10
-	sleep 1
-	tee -a >stdin &
-	tail -f stdout &
-	tail -f stderr &
-	sleep 1
-	ps -p `cat pid`
-	kill `cat pid`
-	rm -f stdin stdout stderr pid
-
+	@ ./timeout --version &>/dev/null && echo "1 ok"
+	@ ./timeout --help    &>/dev/null && echo "2 ok"
+	@ ./timeout --usage   &>/dev/null && echo "3 ok"
+	@ ./timeout sleep 0.001           && echo "4 ok"
+	@ ./timeout sleep 0.01            && echo "5 ok"
+	@ ! `./timeout sleep 0.2`         && echo "6 ok"
+	@ ./timeout -t 250 sleep 0.2      && echo "7 ok"
+	@ ./timeout -k 100 sleep 0.001    && echo "8 ok"
 
 dist:
 	mkdir -p timeout-$(TIMEOUT_VERSION)
@@ -51,12 +48,11 @@ distclean:
 ACTUAL = $(shell ls *.tar.gz)
 DESIRED = $(shell echo "timeout-"`./timeout --version | cut -f 3 -d' '`".tar.gz")
 
-
 distcheck: dist timeout
 	test $(ACTUAL) = $(DESIRED)
 
 clean: distclean
-	rm -f timeout $(OBJ) stdin stdout stderr pid
+	rm -f timeout $(OBJ)
 
 install: timeout
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
