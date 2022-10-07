@@ -55,12 +55,20 @@ enum
 #define ARGL_TEXT(NAME, DEFAULT)                                               \
     (struct argl_def)                                                          \
     {                                                                          \
-        ARGL_TEXT_TYPE, .s = { NAME, DEFAULT }                                 \
+        ARGL_TEXT_TYPE,                                                        \
+        {                                                                      \
+            .s = { NAME, DEFAULT }                                             \
+        }                                                                      \
     }
 #define ARGL_FLAG()                                                            \
     (struct argl_def)                                                          \
     {                                                                          \
-        ARGL_FLAG_TYPE, { 0 }                                                  \
+        ARGL_FLAG_TYPE,                                                        \
+        {                                                                      \
+            {                                                                  \
+                0                                                              \
+            }                                                                  \
+        }                                                                      \
     }
 
 struct argl_option

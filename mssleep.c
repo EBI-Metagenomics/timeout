@@ -1,5 +1,9 @@
+#define _POSIX_C_SOURCE 200809L
+#define _DARWIN_C_SOURCE 1
+#include "mssleep.h"
 #include <assert.h>
 #include <errno.h>
+#include <stdint.h>
 #include <time.h>
 
 /* Source: https://tinycthread.github.io */

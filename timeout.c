@@ -1,18 +1,19 @@
+// Acknowledgement: busybox, coreutils, toybox
+
+#define _POSIX_C_SOURCE 200809L
+#define _DARWIN_C_SOURCE 1
 #include "argless.h"
 #include "fatal.h"
 #include "mssleep.h"
 #include "pp.h"
 #include "strto.h"
 #include "warn.h"
-
-// Acknowledgement: busybox, coreutils, toybox
-
-#define _POSIX_C_SOURCE 200112L
-#define _DARWIN_C_SOURCE 1
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define TIMEOUT_DEFAULT 100
@@ -32,21 +33,21 @@ static struct argl argl = {.options = options,
                            .doc = "Timeout a program.",
                            .version = "0.0.1"};
 
-static pid_t grandparent_pid = 0;
+static int grandparent_pid = 0;
 static int64_t timeout = TIMEOUT_DEFAULT;
 static int64_t ktimeout = KTIMEOUT_DEFAULT;
 
 static char **parse_main_args(int argc, char *argv[]);
-static void noreturn grandparent(char const *program, char **args);
-static void noreturn parent(void);
-static void noreturn grandchild(void);
+noreturn static void grandparent(char const *program, char **args);
+noreturn static void parent(void);
+noreturn static void grandchild(void);
 
 int main(int argc, char *argv[])
 {
     char **args = parse_main_args(argc, argv);
     char const *program = args[0];
 
-    pid_t pid = fork();
+    int pid = fork();
     if (pid < 0) fatal("fork failed");
     if (pid > 0) grandparent(program, args);
     parent();
@@ -65,27 +66,27 @@ static char **parse_main_args(int argc, char *argv[])
     return argl_args(&argl);
 }
 
-static void noreturn grandparent(char const *program, char **args)
+noreturn static void grandparent(char const *program, char **args)
 {
-    pid_t status = 0;
+    int status = 0;
     wait(&status);
     if (!WIFEXITED(status) || WEXITSTATUS(status)) exit(EXIT_FAILURE);
     execvp(program, args);
     pfatal("failed to execute %s", program);
 }
 
-static void noreturn parent(void)
+noreturn static void parent(void)
 {
     grandparent_pid = getppid();
-    pid_t pid = fork();
+    int pid = fork();
     if (pid < 0) fatal("fork failed");
     if (pid > 0) exit(EXIT_SUCCESS);
     grandchild();
 }
 
-static int timeout_wait(int64_t timeout, pid_t pid);
+static int timeout_wait(int64_t timeout, int pid);
 
-static void noreturn grandchild(void)
+noreturn static void grandchild(void)
 {
     if (!timeout_wait(timeout, grandparent_pid)) exit(EXIT_SUCCESS);
     kill(grandparent_pid, SIGTERM);
@@ -94,7 +95,7 @@ static void noreturn grandchild(void)
     exit(EXIT_SUCCESS);
 }
 
-static int timeout_wait(int64_t timeout, pid_t pid)
+static int timeout_wait(int64_t timeout, int pid)
 {
     int64_t step = timeout / 100;
     step = step < 10 ? 10 : step;

@@ -9,7 +9,7 @@
 #include <stdnoreturn.h>
 #include <string.h>
 
-void noreturn fatalxc(int excode, char const *fmt, ...)
+noreturn void fatalxc(int excode, char const *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -19,7 +19,7 @@ void noreturn fatalxc(int excode, char const *fmt, ...)
     exit(excode);
 }
 
-void noreturn pfatalxc(int excode, char const *fmt, ...)
+noreturn void pfatalxc(int excode, char const *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
