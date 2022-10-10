@@ -1,12 +1,13 @@
 .POSIX:
 
-TIMEOUT_VERSION := 0.0.1
+TIMEOUT_VERSION := 0.0.2
 
 CC := gcc
 CFLAGS := $(CFLAGS) -std=c11 -O3 -Wall -Wextra
 
 SRC := argless.c fatal.c mssleep.c strto.c timeout.c warn.c
 OBJ := $(SRC:.c=.o)
+HDR := argless.h fatal.h mssleep.h pp.h strto.h warn.h
 
 PREFIX ?= $(HOME)
 
@@ -38,7 +39,7 @@ test check: timeout
 
 dist:
 	mkdir -p timeout-$(TIMEOUT_VERSION)
-	cp -R LICENSE Makefile README.md argless.c argless.h timeout.c timeout-$(TIMEOUT_VERSION)
+	cp -R LICENSE Makefile README.md $(SRC) $(HDR) timeout-$(TIMEOUT_VERSION)
 	tar -cf - timeout-$(TIMEOUT_VERSION) | gzip > timeout-$(TIMEOUT_VERSION).tar.gz
 	rm -rf timeout-$(TIMEOUT_VERSION)
 
