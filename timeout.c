@@ -31,7 +31,7 @@ static struct argl_option const options[] = {
 static struct argl argl = {.options = options,
                            .args_doc = "<program> [arguments ...]",
                            .doc = "Timeout a program.",
-                           .version = "0.0.1"};
+                           .version = "0.0.2"};
 
 static int grandparent_pid = 0;
 static int64_t timeout = TIMEOUT_DEFAULT;
