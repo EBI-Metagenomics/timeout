@@ -1,6 +1,6 @@
 .POSIX:
 
-TIMEOUT_VERSION := 0.0.2
+TIMEOUT_VERSION := 0.0.3
 
 CC := gcc
 CFLAGS := $(CFLAGS) -std=c11 -O3 -Wall -Wextra
